@@ -407,7 +407,7 @@ h2 {
 }
 
 /* Button Styles */
-.stButton button {
+.stButton button, [data-testid="stFormSubmitButton"] button {
     background: black !important;
     color: #00fff9 !important;
     border: 3px solid #00fff9 !important;
@@ -421,7 +421,7 @@ h2 {
     overflow: hidden;
 }
 
-.stButton button:hover {
+.stButton button:hover, [data-testid="stFormSubmitButton"] button:hover {
     background: #00fff9 !important;
     color: black !important;
     box-shadow: 0 0 10px #00fff9, 0 0 20px #00fff9, 0 0 30px #00fff9 !important;
@@ -429,7 +429,7 @@ h2 {
 }
 
 /* Button Hover Effect */
-.stButton button::before {
+.stButton button::before, [data-testid="stFormSubmitButton"] button::before {
     content: '';
     position: absolute;
     top: 0;
@@ -441,19 +441,19 @@ h2 {
     pointer-events: none;
 }
 
-.stButton button:hover::before {
+.stButton button:hover::before, [data-testid="stFormSubmitButton"] button:hover::before {
     left: 100%;
 }
 
 /* Input Fields */
-div[data-baseweb="input"] {
+div[data-baseweb="input"], [data-testid="stForm"] div[data-baseweb="input"] {
     background: #000 !important;
     border: 2px solid #ff00c1 !important;
     box-shadow: 0 0 5px #ff00c1 !important;
     transition: all 0.3s ease;
 }
 
-div[data-baseweb="input"]:focus-within {
+div[data-baseweb="input"]:focus-within, [data-testid="stForm"] div[data-baseweb="input"]:focus-within {
     border: 2px solid #ff00c1 !important;
     box-shadow: 0 0 10px #ff00c1, 0 0 20px #ff00c1 !important;
 }
@@ -461,6 +461,13 @@ div[data-baseweb="input"]:focus-within {
 input[type="text"] {
     color: #adff2f !important;
     font-size: 18px !important;
+}
+
+/* Form Styling */
+[data-testid="stForm"] {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
 }
 
 /* Room Code Display */
@@ -1430,8 +1437,8 @@ def chat_interface():
     
     # Main chat area
     with col1:
-        # Chat messages container
-        st.markdown('<div class="chat-container container-scan" id="chat-container">', unsafe_allow_html=True)
+        # Create a container for the chat area
+        chat_container = st.container()
         
         # Get messages from Redis
         messages = get_messages(room_id)
@@ -1444,79 +1451,85 @@ def chat_interface():
         if len(messages) > st.session_state.message_count:
             st.session_state.message_count = len(messages)
         
-        # Display messages with their appropriate styles
-        if messages:
-            for msg in messages:
-                if msg["type"] == "system":
-                    # System message
-                    st.markdown(
-                        f"""
-                        <div class="message system-message">
-                            {msg["content"]}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                elif msg["username"] == username:
-                    # User's own message
-                    st.markdown(
-                        f"""
-                        <div class="message user-message">
-                            <span class="hot-pink-text">{msg["username"]}:</span> {msg["content"]}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                else:
-                    # Other users' messages
-                    st.markdown(
-                        f"""
-                        <div class="message other-message">
-                            <span class="cyan-text">{msg["username"]}:</span> {msg["content"]}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-        else:
-            # No messages yet
+        # Build the chat container with custom styling
+        with chat_container:
+            # Apply custom styling to make the container look like a retro terminal
             st.markdown(
                 """
-                <div style="color: #adff2f; margin-top: 30px; text-align: center;" class="text-flicker">
-                    NO MESSAGES YET
-                </div>
-                <div style="color: #00fff9; margin-top: 10px; text-align: center;">
-                    Be the first to start the conversation!
-                </div>
-                """,
+                <style>
+                [data-testid="stVerticalBlock"] > [style*="flex-direction: column"] > [data-testid="stVerticalBlock"] {
+                    background-color: rgba(0, 0, 0, 0.7);
+                    border: 3px solid #ff00c1;
+                    border-radius: 0;
+                    box-shadow: 0 0 10px #ff00c1;
+                    padding: 20px;
+                    margin: 20px 0;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    position: relative;
+                }
+                </style>
+                """, 
                 unsafe_allow_html=True
             )
+            
+            # Display messages with their appropriate styles
+            if messages:
+                for msg in messages:
+                    if msg["type"] == "system":
+                        # System message
+                        st.markdown(
+                            f"""
+                            <div class="message system-message">
+                                {msg["content"]}
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                    elif msg["username"] == username:
+                        # User's own message
+                        st.markdown(
+                            f"""
+                            <div class="message user-message">
+                                <span class="hot-pink-text">{msg["username"]}:</span> {msg["content"]}
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        # Other users' messages
+                        st.markdown(
+                            f"""
+                            <div class="message other-message">
+                                <span class="cyan-text">{msg["username"]}:</span> {msg["content"]}
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+            else:
+                # No messages yet
+                st.markdown(
+                    """
+                    <div style="color: #adff2f; margin-top: 30px; text-align: center;" class="text-flicker">
+                        NO MESSAGES YET
+                    </div>
+                    <div style="color: #00fff9; margin-top: 10px; text-align: center;">
+                        Be the first to start the conversation!
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
         
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Message input - FIXED: Changed key to avoid session state conflict
-        message = st.text_input("", key="message_input_field", placeholder="TYPE YOUR MESSAGE HERE...")
-        
-        col_a, col_b = st.columns([5, 1])
-        
-        with col_b:
-            if st.button("SEND", key="send_btn"):
-                if message:
-                    # Send message to Redis
-                    send_message(room_id, username, message)
-                    # Clear input - FIXED: Using message_input_field instead of message_input
-                    st.session_state.message_input_field = ""
-                    # Rerun to update chat
-                    st.rerun()
-                
-        # Send on Enter key
-        if message and message != st.session_state.get("last_message", ""):
-            st.session_state.last_message = message
-            # Send message to Redis
-            send_message(room_id, username, message)
-            # Clear input - FIXED: Using message_input_field instead of message_input
-            st.session_state.message_input_field = ""
-            # Rerun to update chat
-            st.rerun()
+        # Message input with form (this approach doesn't try to clear the field directly)
+        with st.form(key="message_form"):
+            message = st.text_input("", placeholder="TYPE YOUR MESSAGE HERE...")
+            submit = st.form_submit_button("SEND")
+            
+            if submit and message:
+                # Send message to Redis
+                send_message(room_id, username, message)
+                # The form will automatically clear after submission and rerun
+                st.rerun()
     
     # Check for updates from Redis pub/sub
     check_for_updates()
