@@ -1154,15 +1154,15 @@ def host_chatroom():
         unsafe_allow_html=True
     )
     
-    # Input fields for chatroom name and host username
+    # Input fields for chatroom name and host username - FIXED KEYS
     st.markdown('<p class="cyan-text text-flicker" style="margin-top: 30px;">ENTER CHATROOM INFO:</p>', unsafe_allow_html=True)
     
     with st.container():
         col1, col2 = st.columns(2)
         with col1:
-            room_name = st.text_input("ROOM NAME", key="room_name", placeholder="MY RADICAL CHATROOM")
+            room_name = st.text_input("ROOM NAME", key="room_name_input", placeholder="MY RADICAL CHATROOM")
         with col2:
-            host_name = st.text_input("YOUR NAME", key="host_name", placeholder="NEON_RIDER")
+            host_name = st.text_input("YOUR NAME", key="host_name_input", placeholder="NEON_RIDER")
     
     # Create chatroom button
     if st.button("CREATE CHATROOM", key="create_room_btn"):
@@ -1191,11 +1191,11 @@ def host_chatroom():
             time.sleep(1.5)
             
             if result["success"]:
-                # Store chatroom info in session state
+                # Store chatroom info in session state - FIXED KEYS
                 st.session_state.room_code = result["code"]
                 st.session_state.room_id = result["id"]
                 st.session_state.username = host_name
-                st.session_state.room_name = room_name
+                st.session_state.current_room_name = room_name  # Changed key here
                 st.session_state.is_host = True
                 st.session_state.page = "chat"
                 
@@ -1241,15 +1241,15 @@ def join_chatroom():
         unsafe_allow_html=True
     )
     
-    # Input fields for room code and username
+    # Input fields for room code and username - FIXED KEYS
     st.markdown('<p class="cyan-text text-flicker" style="margin-top: 30px;">ENTER ACCESS CREDENTIALS:</p>', unsafe_allow_html=True)
     
     with st.container():
         col1, col2 = st.columns(2)
         with col1:
-            room_code = st.text_input("ROOM CODE", key="join_room_code", placeholder="12345")
+            room_code = st.text_input("ROOM CODE", key="join_room_code_input", placeholder="12345")
         with col2:
-            username = st.text_input("YOUR NAME", key="join_username", placeholder="PIXEL_PUNK")
+            username = st.text_input("YOUR NAME", key="join_username_input", placeholder="PIXEL_PUNK")
     
     # Join button
     if st.button("JOIN CHATROOM", key="join_room_btn"):
@@ -1282,11 +1282,11 @@ def join_chatroom():
             # Host approves automatically for this version
             # In a full version, you would wait for host approval
             
-            # Store info in session state
+            # Store info in session state - FIXED KEYS
             st.session_state.room_code = room_code
             st.session_state.room_id = chatroom["id"]
             st.session_state.username = username
-            st.session_state.room_name = chatroom["name"]
+            st.session_state.current_room_name = chatroom["name"]  # Changed key here
             st.session_state.is_host = False
             st.session_state.page = "chat"
             
@@ -1338,8 +1338,8 @@ def chat_interface():
     if st.session_state.get("is_host", False):
         start_request_listener(room_id)
     
-    # Display chat header
-    room_name = st.session_state.room_name
+    # Display chat header - FIXED KEY
+    room_name = st.session_state.current_room_name  # Use current_room_name instead of room_name
     username = st.session_state.username
     is_host = st.session_state.get("is_host", False)
     
@@ -1582,8 +1582,8 @@ def exit_chat():
     # Clear chatroom data from session
     if "room_id" in st.session_state:
         del st.session_state.room_id
-    if "room_name" in st.session_state:
-        del st.session_state.room_name
+    if "current_room_name" in st.session_state:  # FIXED KEY
+        del st.session_state.current_room_name
     if "room_code" in st.session_state:
         del st.session_state.room_code
     if "username" in st.session_state:
@@ -1619,8 +1619,8 @@ def close_chat():
     # Clear chatroom data from session
     if "room_id" in st.session_state:
         del st.session_state.room_id
-    if "room_name" in st.session_state:
-        del st.session_state.room_name
+    if "current_room_name" in st.session_state:  # FIXED KEY
+        del st.session_state.current_room_name
     if "room_code" in st.session_state:
         del st.session_state.room_code
     if "username" in st.session_state:
@@ -1652,4 +1652,3 @@ def main():
 # Run the main application
 if __name__ == "__main__":
     main()
-    
