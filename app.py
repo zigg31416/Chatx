@@ -1057,12 +1057,12 @@ def check_for_updates():
     # Check for new messages
     if st.session_state.new_messages:
         # Trigger a rerun to update the UI
-        st.experimental_rerun()
+        st.rerun()
     
     # Check for new join requests
     if st.session_state.new_requests:
         # Trigger a rerun to update the UI
-        st.experimental_rerun()
+        st.rerun()
 
 # ----- Application Pages -----
 
@@ -1125,7 +1125,7 @@ def home_page():
                         unsafe_allow_html=True
                     )
                 st.session_state.page = "host"
-                st.experimental_rerun()
+                st.rerun()
         
         with col_b:
             if st.button("JOIN CHATROOM", key="join_btn"):
@@ -1140,7 +1140,7 @@ def home_page():
                         unsafe_allow_html=True
                     )
                 st.session_state.page = "join"
-                st.experimental_rerun()
+                st.rerun()
 
 def host_chatroom():
     """Host a new chatroom interface"""
@@ -1210,7 +1210,7 @@ def host_chatroom():
                         unsafe_allow_html=True
                     )
                 
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error(f"Error creating chatroom: {result.get('error', 'Unknown error')}")
     
@@ -1227,7 +1227,7 @@ def host_chatroom():
                 unsafe_allow_html=True
             )
         st.session_state.page = "home"
-        st.experimental_rerun()
+        st.rerun()
 
 def join_chatroom():
     """Interface for joining an existing chatroom"""
@@ -1304,7 +1304,7 @@ def join_chatroom():
                     unsafe_allow_html=True
                 )
             
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error(f"Error joining chatroom: {result.get('error', 'Invalid room code or room is inactive')}")
     
@@ -1321,14 +1321,14 @@ def join_chatroom():
                 unsafe_allow_html=True
             )
         st.session_state.page = "home"
-        st.experimental_rerun()
+        st.rerun()
 
 def chat_interface():
     """Enhanced chat interface with Redis integration"""
     # Check if user is in a room
     if "room_id" not in st.session_state:
         st.session_state.page = "home"
-        st.experimental_rerun()
+        st.rerun()
         return
     
     # Start real-time listeners
@@ -1374,7 +1374,7 @@ def chat_interface():
     with col2:
         st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
         if st.button("REFRESH", key="refresh_btn"):
-            st.experimental_rerun()
+            st.rerun()
         
         if st.button("EXIT CHATROOM", key="exit_btn"):
             exit_chat()
@@ -1399,7 +1399,7 @@ def chat_interface():
                 unsafe_allow_html=True
             )
             
-            st.experimental_rerun()
+            st.rerun()
         
         if is_host:
             st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
@@ -1426,7 +1426,7 @@ def chat_interface():
                     unsafe_allow_html=True
                 )
                 
-                st.experimental_rerun()
+                st.rerun()
     
     # Main chat area
     with col1:
@@ -1506,7 +1506,7 @@ def chat_interface():
                     # Clear input 
                     st.session_state.message_input = ""
                     # Rerun to update chat
-                    st.experimental_rerun()
+                    st.rerun()
                 
         # Send on Enter key
         if message and message != st.session_state.get("last_message", ""):
@@ -1516,7 +1516,7 @@ def chat_interface():
             # Clear input
             st.session_state.message_input = ""
             # Rerun to update chat
-            st.experimental_rerun()
+            st.rerun()
     
     # Check for updates from Redis pub/sub
     check_for_updates()
@@ -1561,13 +1561,13 @@ def handle_join_requests():
                                 f"{updated_request['username']} has joined the chatroom",
                                 "system"
                             )
-                            st.experimental_rerun()
+                            st.rerun()
                 
                 with col2:
                     if st.button("REJECT", key=f"reject_{request['id']}"):
                         # Update request status in Redis
                         update_request_status(request["id"], "rejected")
-                        st.experimental_rerun()
+                        st.rerun()
 
 def exit_chat():
     """Exit the current chatroom"""
