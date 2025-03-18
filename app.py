@@ -1493,8 +1493,8 @@ def chat_interface():
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Message input
-        message = st.text_input("", key="message_input", placeholder="TYPE YOUR MESSAGE HERE...")
+        # Message input - FIXED: Changed key to avoid session state conflict
+        message = st.text_input("", key="message_input_field", placeholder="TYPE YOUR MESSAGE HERE...")
         
         col_a, col_b = st.columns([5, 1])
         
@@ -1503,8 +1503,8 @@ def chat_interface():
                 if message:
                     # Send message to Redis
                     send_message(room_id, username, message)
-                    # Clear input 
-                    st.session_state.message_input = ""
+                    # Clear input - FIXED: Using message_input_field instead of message_input
+                    st.session_state.message_input_field = ""
                     # Rerun to update chat
                     st.rerun()
                 
@@ -1513,8 +1513,8 @@ def chat_interface():
             st.session_state.last_message = message
             # Send message to Redis
             send_message(room_id, username, message)
-            # Clear input
-            st.session_state.message_input = ""
+            # Clear input - FIXED: Using message_input_field instead of message_input
+            st.session_state.message_input_field = ""
             # Rerun to update chat
             st.rerun()
     
